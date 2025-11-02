@@ -1,0 +1,40 @@
+# ── Rust ──
+/target/
+**/target/
+
+# ── VCS / IDE ──
+.git
+.gitignore
+.gitattributes
+.github/
+/.idea/
+/.vscode/
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+
+# ── Binarres ──
+*.exe
+*.dll
+*.so
+*.dylib
+*.rlib
+*.a
+*.o
+
+# ── Temp ──
+*.log
+*.tmp
+*.swp
+*.swo
+
+# ── Docker / CI ──
+docker-compose*.yml
+Dockerfile*
+
+protobuf-src-fake
+
+# ── Project ──
+/logs
+

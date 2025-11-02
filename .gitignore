@@ -1,0 +1,7 @@
+.idea/
+.vscode/
+.env
+target/
+docs/
+db_data/
+logs/

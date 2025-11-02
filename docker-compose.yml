@@ -1,0 +1,63 @@
+volumes:
+  cargo-target:          # кеш артефактов компиляции
+  cargo-registry:        # кеш crates.io
+
+
+networks:
+  connect:
+    driver: bridge
+
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: solana-db
+    networks: [ connect ]
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5452:5432"
+    restart: unless-stopped
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: solana-app
+    networks:
+      - connect
+    depends_on:
+      - db
+
+    environment:
+      MALLOC_PERTURB_: "204"
+      # Rust
+      RUST_BACKTRACE: "full"
+      # Проверки glibc malloc (только на glibc!)
+      MALLOC_CHECK_: "3"
+      GLIBC_TUNABLES: "glibc.malloc.check=3"
+
+    ulimits:
+      core: -1
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp=unconfined
+    tty: true
+    stdin_open: true
+
+    volumes:
+      - ./:/app
+      - ./target:/app/target
+      - cargo-registry:/usr/local/cargo/registry
+
+    ports:
+      - "3006:3000"
+
+    command: [
+      "bash","-lc",
+      "ulimit -c unlimited; \
+         exec /usr/local/cargo/bin/cargo watch -w src \
+           -x 'clippy' \
+           -x 'run'"
+    ]
